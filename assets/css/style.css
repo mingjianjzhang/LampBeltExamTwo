@@ -6,3 +6,7 @@
 h2 {
 	color: green;
 }
+
+ul li {
+	display: inline-block;
+}

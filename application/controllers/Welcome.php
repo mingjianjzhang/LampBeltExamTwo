@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Welcome extends CI_Controller {
-
+ 
 	/**
 	 * Index Page for this controller.
 	 *
@@ -18,12 +18,19 @@ class Welcome extends CI_Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see https://codeigniter.com/user_guide/general/urls.html
 	 */
+
+	public function __construct() {
+		parent::__construct();
+		$this->output->enable_profiler();
+		$this->load->model('User');
+	}
 	public function index()
 	{
 		$this->load->view('loginRegView');
 	}
 
 	public function register() {
+
 		$result = $this->User->validateReg($this->input->post());
 		if ($result == 'valid') {
 			$this->User->register($this->input->post());
@@ -31,18 +38,18 @@ class Welcome extends CI_Controller {
 			$this->session->set_flashdata("success", "You have successfully registered. Please log in.");
 			redirect("/");
 		} else {
-			$this->session->set_flashdata("regErrors", $result);
+			$this->session->set_flashdata("errors", $result);
 			redirect("/");
 		}
 	}
 	public function login() {
 		$result = $this->User->validateLogin($this->input->post());
 		if ($result == 'valid') {
-			$userInfo = $this->User->get_user($this->input->post('username'));
+			$userInfo = $this->User->get_user($this->input->post('email'));
 			if ($userInfo) {
 				if ($this->input->post('password') == $userInfo['password']) {
 					$this->session->set_userdata(array('id' => $userInfo['id'], "name" => $userInfo['name']));
-					redirect('/travels');
+					redirect('/appointments');
 				} else {
 					$this->session->set_flashdata("badPassword", "Wrong Password");
 					redirect('/');
@@ -55,5 +62,10 @@ class Welcome extends CI_Controller {
 			$this->session->set_flashdata('loginErrors', $result);
 			redirect('/');
 		}
+	}
+
+	public function logout() {
+		session_destroy();
+		redirect("/");
 	}
 }
